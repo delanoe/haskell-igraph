@@ -828,7 +828,7 @@ library
     , containers
     , data-ordlist
     , primitive
-    , singletons >=2.7
+    , singletons == 2.7.*
   default-language: Haskell2010
 
 test-suite test
