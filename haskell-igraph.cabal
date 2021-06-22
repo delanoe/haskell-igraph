@@ -276,7 +276,7 @@ library
       cbits/haskell_igraph.c
       igraph/src/abort_.c
       igraph/src/adjlist.c
-      igraph/src/arithchk.c
+      -- igraph/src/arithchk.c
       igraph/src/arpack.c
       igraph/src/array.c
       igraph/src/atlas.c
