@@ -7,6 +7,7 @@ module IGraph.Algorithms.Community
     , leadingEigenvector
     , spinglass
     , leiden
+    , infomap
     , modularity
     ) where
 
@@ -53,6 +54,8 @@ findCommunity gr getNodeW getEdgeW method _ = allocaVector $ \result ->
                 _ <- withListMaybe nw $ \nw' -> igraphCommunityLeiden
                     (_graph gr) ew' nw' _resolution _beta False result nullPtr
                 return ()
+            Infomap i -> igraphCommunityInfomap (_graph gr) ew' nullPtr i result nullPtr
+
         fmap ( map (fst . unzip) . groupBy ((==) `on` snd)
               . sortBy (comparing snd) . zip [0..] ) $ toList result
   where
@@ -78,6 +81,8 @@ data CommunityMethod =
         { _resolution :: Double
         , _beta :: Double
         }
+    | Infomap { _iIter :: Int  -- ^ number of iterations
+               }
 
 -- | Default parameters for the leading eigenvector algorithm.
 leadingEigenvector :: CommunityMethod
@@ -110,8 +115,11 @@ spinglass = Spinglass
 -- CPM: 
 leiden :: CommunityMethod
 leiden = Leiden
-    { _resolution = 1
-    , _beta = 0.01 }
+    { _resolution = 0.001
+    , _beta = 0.001 }
+
+infomap :: CommunityMethod
+infomap = Infomap 10
 
 {#fun igraph_community_spinglass as ^
     { `IGraph'
@@ -158,6 +166,18 @@ leiden = Leiden
     , alloca- `Int' peekIntConv*
     , id `Ptr CDouble'
     } -> `CInt' void- #}
+
+{#fun igraph_community_infomap as ^
+    { `IGraph'
+    , castPtr `Ptr Vector'
+    , castPtr `Ptr Vector'
+    , `Int'
+    , castPtr `Ptr Vector'
+    , id `Ptr CDouble'
+    } -> `CInt' void- #}
+
+
+
 
 type T = FunPtr ( Ptr ()
                 -> CLong

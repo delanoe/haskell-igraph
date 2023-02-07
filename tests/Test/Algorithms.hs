@@ -144,7 +144,7 @@ bridgeTest = testCase "Bridges" $ edgeLab g <$> bridges g @?= ["bridge"]
 
 communityTest :: TestTree
 communityTest = testGroup "Community"
-    [ consistency, consistency2 ]
+    [ consistency, consistency2, consistency3]
   where
     consistency = testCase "Consistency" $ do
         rs <- replicateM 50 $ withSeed 134 $ findCommunity zacharyKarate Nothing Nothing spinglass
@@ -152,6 +152,11 @@ communityTest = testGroup "Community"
     consistency2 = testCase "Consistency -- leiden" $ do
         rs <- replicateM 50 $ withSeed 234 $ findCommunity zacharyKarate Nothing Nothing leiden
         True @=? all (== head rs) rs
+
+    consistency3 = testCase "Consistency -- infomap" $ do
+        rs <- replicateM 50 $ withSeed 234 $ findCommunity zacharyKarate Nothing Nothing infomap
+        True @=? all (== head rs) rs
+
     gr = mkGraph (replicate 10 ()) $ map (\(i,j) -> ((i,j),()))
         [ (0, 1), (0, 2), (0, 3), (0, 4), (1, 2), (1, 3), (1, 4), (2, 3), (2, 4)
         , (3, 4), (5, 6), (5, 7), (5, 8), (5, 9), (6, 7), (6, 8), (6, 9), (7, 8)
